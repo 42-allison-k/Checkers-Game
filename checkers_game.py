@@ -1,5 +1,5 @@
 import collections
-from typing import Tuple
+from typing import Tuple, List
 
 PAWN = "P"
 KING = "K"
@@ -15,15 +15,20 @@ black_pieces = [PieceNT(type=PAWN, position=pos) for pos in black_start_position
 def translate_external_to_internal(user_input: str) -> Position:
     """Takes in the string version of a pieces position and turns it in to a tuple"""
     cols = "ABCDEFGH"
-    ext_piece_list = [*user_input]
-    piece_col = cols.index(ext_piece_list[0])
-    piece_row = int(ext_piece_list[1])
+    piece_col = cols.index(user_input[0])
+    piece_row = int(user_input[1]) - 1
+    if piece_row > 7:
+        raise ValueError("row must be not greater than 8")
     position = (piece_col, piece_row)
     return position
 
 
 def translate_internal_to_external(position: Position) -> str:
-    """Takes in teh position of a piece as a tuple and changes it to the string version for the user"""
+    """
+    Returns position as a letter + number pair
+
+    example: (0, 1) -> A2
+    """
     cols = "ABCDEFGH"
     piece_col = cols[position[0]]
     piece_row = int(position[1])
@@ -39,3 +44,7 @@ def get_user_input():
         print(translate_internal_to_external(pos.position))
     player_input = input("What piece would you like to move?").upper()
     return player_input
+
+
+def get_move_options(cur_position: Position) -> List:
+    pass
