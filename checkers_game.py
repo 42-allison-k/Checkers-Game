@@ -31,7 +31,7 @@ def translate_internal_to_external(position: Position) -> str:
     """
     cols = "ABCDEFGH"
     piece_col = cols[position[0]]
-    piece_row = int(position[1])
+    piece_row = int(position[1]) + 1
     external_piece = f"{piece_col}{piece_row}"
     return external_piece
 
@@ -46,5 +46,27 @@ def get_user_input():
     return player_input
 
 
+# still need to add king opts
 def get_move_options(cur_position: Position) -> List:
-    pass
+    for piece in black_pieces:
+        if piece.position == cur_position:
+            cur_piece = piece
+
+            move_opt_1 = (cur_piece.position[0] + 1, cur_piece.position[1] + 1)
+            move_opt_2 = (cur_piece.position[0] - 1, cur_piece.position[1] + 1)
+            move_opt_3 = (cur_piece.position[0] + 1, cur_piece.position[1] - 1)
+            move_opt_4 = (cur_piece.position[0] - 1, cur_piece.position[1] - 1)
+
+            if (
+                cur_piece.type == "P"
+                and cur_piece.position[0] != 0
+                and cur_piece.position[1] != 7
+            ):
+                move_opts = [move_opt_1, move_opt_2]
+                return move_opts
+            elif cur_piece.type == "P" and cur_piece.position[0] == 0:
+                move_opts = [move_opt_1]
+                return move_opts
+            elif cur_piece.type == "P" and cur_piece.position[1] == 7:
+                move_opts = [move_opt_2]
+                return move_opts
