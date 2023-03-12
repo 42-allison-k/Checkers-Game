@@ -13,7 +13,11 @@ black_pieces = [PieceNT(type=PAWN, position=pos) for pos in black_start_position
 
 
 def translate_external_to_internal(user_input: str) -> Position:
-    """Takes in the string version of a pieces position and turns it in to a tuple"""
+    """
+    Returns position as a tuple
+
+    example: A2 -> (0, 1)
+    """
     cols = "ABCDEFGH"
     piece_col = cols.index(user_input[0])
     piece_row = int(user_input[1]) - 1
@@ -38,7 +42,7 @@ def translate_internal_to_external(position: Position) -> str:
 
 # once the rest is set up use an if statement to check for black or white pieces
 def get_user_input():
-    """Shows the user the availible pieces and asks which on they would like to move"""
+    """Returns the piece the player would like to move from a list of availible pieces"""
     print("Availible Pieces")
     for pos in black_pieces:
         print(translate_internal_to_external(pos.position))
@@ -46,8 +50,12 @@ def get_user_input():
     return player_input
 
 
-# still need to add king opts
 def get_move_options(cur_position: Position) -> List:
+    """
+    Returns a list of possible moves
+
+    Example: (2, 1) -> [(3, 2), (1, 2)]
+    """
     for piece in black_pieces:
         if piece.position == cur_position:
             cur_piece = piece
@@ -60,13 +68,61 @@ def get_move_options(cur_position: Position) -> List:
             if (
                 cur_piece.type == "P"
                 and cur_piece.position[0] != 0
-                and cur_piece.position[1] != 7
+                and cur_piece.position[0] != 7
             ):
                 move_opts = [move_opt_1, move_opt_2]
                 return move_opts
             elif cur_piece.type == "P" and cur_piece.position[0] == 0:
                 move_opts = [move_opt_1]
                 return move_opts
-            elif cur_piece.type == "P" and cur_piece.position[1] == 7:
+            elif cur_piece.type == "P" and cur_piece.position[0] == 7:
                 move_opts = [move_opt_2]
+                return move_opts
+            if cur_piece.type == "K":
+                if (
+                    cur_position[0] != 0
+                    and cur_position[0] != 7
+                    and cur_position[1] != 0
+                    and cur_position[1] != 7
+                ):
+                    move_opts = [move_opt_1, move_opt_2, move_opt_3, move_opt_4]
+                    return move_opts
+                elif (
+                    cur_position[0] == 0
+                    and cur_position[1] != 0
+                    and cur_position[1] != 7
+                ):
+                    move_opts = [move_opt_1, move_opt_3]
+                elif (
+                    cur_position[0] == 7
+                    and cur_position[1] != 0
+                    and cur_position[1] != 7
+                ):
+                    move_opts = [move_opt_2, move_opt_4]
+                    return move_opts
+                elif (
+                    cur_position[1] == 0
+                    and cur_position[0] != 0
+                    and cur_position[0] != 7
+                ):
+                    move_opts = [move_opt_1, move_opt_2]
+                    return move_opts
+                elif (
+                    cur_position[1] == 7
+                    and cur_position[0] != 0
+                    and cur_position[0] != 7
+                ):
+                    move_opts = [move_opt_3, move_opt_4]
+                    return move_opts
+                elif cur_position == (0, 0):
+                    move_opts = [move_opt_1]
+                    return move_opts
+                elif cur_position == (7, 0):
+                    move_opts = [move_opt_2]
+                    return move_opts
+                elif cur_position == (0, 7):
+                    move_opts = [move_opt_3]
+                    return move_opts
+                elif cur_position == (7, 7):
+                    move_opts = [move_opt_4]
                 return move_opts
