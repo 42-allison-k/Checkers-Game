@@ -50,6 +50,7 @@ def test_translate_internal_to_external_success(
 
 
 # need to figure out how to do this so it works
+# include check for piece in destination
 @pytest.mark.parametrize(
     ["input_tup, output_list"],
     [((0, 1), [(1, 2)]), ((2, 1), [(1, 2), (3, 2)]), ((6, 1), [(7, 2)])],

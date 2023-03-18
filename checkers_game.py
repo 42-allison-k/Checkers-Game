@@ -1,15 +1,33 @@
 import collections
 from typing import Tuple, List
+from dataclasses import dataclass
+import operator
 
+
+BLACK = "B"
+WHITE = "W"
+GOAL_ROW = {BLACK: 7, WHITE: 0}
 PAWN = "P"
 KING = "K"
 Position = Tuple[int, int]
 
 white_start_positions = {(1, 6), (3, 6), (5, 6), (7, 6), (0, 7), (2, 7), (4, 7), (6, 7)}
 black_start_positions = {(1, 0), (3, 0), (5, 0), (7, 0), (0, 1), (2, 1), (4, 1), (6, 1)}
-PieceNT = collections.namedtuple("Piece", ["type", "position"])
-white_pieces = [PieceNT(type=PAWN, position=pos) for pos in white_start_positions]
-black_pieces = [PieceNT(type=PAWN, position=pos) for pos in black_start_positions]
+
+
+@dataclass
+class Piece:
+    type: str
+    position: Position
+    color: str
+
+
+white_pieces = {
+    pos: Piece(type=PAWN, position=pos, color=WHITE) for pos in white_start_positions
+}
+black_pieces = {
+    pos: Piece(type=PAWN, position=pos, color=BLACK) for pos in black_start_positions
+}
 
 
 def translate_external_to_internal(user_input: str) -> Position:
@@ -44,85 +62,70 @@ def translate_internal_to_external(position: Position) -> str:
 def get_user_input():
     """Returns the piece the player would like to move from a list of availible pieces"""
     print("Availible Pieces")
-    for pos in black_pieces:
-        print(translate_internal_to_external(pos.position))
+    for position in black_pieces.keys():
+        print(translate_internal_to_external(position))
     player_input = input("What piece would you like to move?").upper()
     return player_input
 
 
-def get_move_options(cur_position: Position) -> List:
+# change name of variable
+# look breaking into more functions
+# function to determines forward moves and backward moves for pawns and kings
+# def get_move_options(cur_position: Position) -> List:
+# """
+# Returns a list of possible moves
+
+# Example: (2, 1) -> [(3, 2), (1, 2)]
+# """
+
+
+def get_forward_move(piece: Piece):
     """
     Returns a list of possible moves
 
     Example: (2, 1) -> [(3, 2), (1, 2)]
     """
-    for piece in black_pieces:
-        if piece.position == cur_position:
-            cur_piece = piece
+    """
+    check color
+    if black row increasing
+    if white row decreasing
+    start with [] of moves and add moves if they are posible
+    check for piece at destination
+    check keys of each dict for black and white pieces
+    if destination is in black and white dict its not a posible move
+    TODO: add jumping pieces
+    if destination is a posible move add it to the list
+    return the list
+    """
 
-            move_opt_1 = (cur_piece.position[0] + 1, cur_piece.position[1] + 1)
-            move_opt_2 = (cur_piece.position[0] - 1, cur_piece.position[1] + 1)
-            move_opt_3 = (cur_piece.position[0] + 1, cur_piece.position[1] - 1)
-            move_opt_4 = (cur_piece.position[0] - 1, cur_piece.position[1] - 1)
+    possible_moves = []
+    piece_row_pos = piece.position[1]
+    piece_col_pos = piece.position[0]
+    dist_per_move = 1
+    goal = GOAL_ROW[piece.color]
+    row_destination_func = (
+        operator.__add__ if goal > piece_row_pos else operator.__sub__
+    )
+    # col_opt_1_func = operator.__add__ if piece_col_pos != 0 else print("no move")
+    # col_opt_2_func = operator.__sub__ if piece_col_pos != 7 else print("no move")
+    # col_opt_1_func = operator.__add__, piece_col_pos
+    # col_opt_2_func = operator.__sub__, piece_col_pos
+    col_opt_1 = piece_col_pos + 1
+    col_opt_2 = piece_col_pos - 1
+    if 0 <= col_opt_1 < 8:
+        possible_moves.append(
+            (col_opt_1, row_destination_func(piece_row_pos, dist_per_move))
+        )
+    if 0 <= col_opt_2 < 8:
+        possible_moves.append(
+            (col_opt_2, row_destination_func(piece_row_pos, dist_per_move))
+        )
 
-            if (
-                cur_piece.type == "P"
-                and cur_piece.position[0] != 0
-                and cur_piece.position[0] != 7
-            ):
-                move_opts = [move_opt_1, move_opt_2]
-                return move_opts
-            elif cur_piece.type == "P" and cur_piece.position[0] == 0:
-                move_opts = [move_opt_1]
-                return move_opts
-            elif cur_piece.type == "P" and cur_piece.position[0] == 7:
-                move_opts = [move_opt_2]
-                return move_opts
-            if cur_piece.type == "K":
-                if (
-                    cur_position[0] != 0
-                    and cur_position[0] != 7
-                    and cur_position[1] != 0
-                    and cur_position[1] != 7
-                ):
-                    move_opts = [move_opt_1, move_opt_2, move_opt_3, move_opt_4]
-                    return move_opts
-                elif (
-                    cur_position[0] == 0
-                    and cur_position[1] != 0
-                    and cur_position[1] != 7
-                ):
-                    move_opts = [move_opt_1, move_opt_3]
-                elif (
-                    cur_position[0] == 7
-                    and cur_position[1] != 0
-                    and cur_position[1] != 7
-                ):
-                    move_opts = [move_opt_2, move_opt_4]
-                    return move_opts
-                elif (
-                    cur_position[1] == 0
-                    and cur_position[0] != 0
-                    and cur_position[0] != 7
-                ):
-                    move_opts = [move_opt_1, move_opt_2]
-                    return move_opts
-                elif (
-                    cur_position[1] == 7
-                    and cur_position[0] != 0
-                    and cur_position[0] != 7
-                ):
-                    move_opts = [move_opt_3, move_opt_4]
-                    return move_opts
-                elif cur_position == (0, 0):
-                    move_opts = [move_opt_1]
-                    return move_opts
-                elif cur_position == (7, 0):
-                    move_opts = [move_opt_2]
-                    return move_opts
-                elif cur_position == (0, 7):
-                    move_opts = [move_opt_3]
-                    return move_opts
-                elif cur_position == (7, 7):
-                    move_opts = [move_opt_4]
-                return move_opts
+    return possible_moves
+
+
+print(get_forward_move(black_pieces[(0, 1)]))
+
+
+def get_backward_move():
+    pass
