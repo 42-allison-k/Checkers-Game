@@ -100,31 +100,37 @@ def get_forward_move(piece: Piece):
 
     possible_moves = []
     piece_row_pos = piece.position[1]
-    piece_col_pos = piece.position[0]
     dist_per_move = 1
     goal = GOAL_ROW[piece.color]
     row_destination_func = (
         operator.__add__ if goal > piece_row_pos else operator.__sub__
     )
-    # col_opt_1_func = operator.__add__ if piece_col_pos != 0 else print("no move")
-    # col_opt_2_func = operator.__sub__ if piece_col_pos != 7 else print("no move")
-    # col_opt_1_func = operator.__add__, piece_col_pos
-    # col_opt_2_func = operator.__sub__, piece_col_pos
-    col_opt_1 = piece_col_pos + 1
-    col_opt_2 = piece_col_pos - 1
-    if 0 <= col_opt_1 < 8:
-        possible_moves.append(
-            (col_opt_1, row_destination_func(piece_row_pos, dist_per_move))
-        )
-    if 0 <= col_opt_2 < 8:
-        possible_moves.append(
-            (col_opt_2, row_destination_func(piece_row_pos, dist_per_move))
-        )
+    move_opt_1 = (
+        (piece.position[0] + 1),
+        row_destination_func(piece_row_pos, dist_per_move),
+    )
+    move_opt_2 = (
+        (piece.position[0] - 1),
+        row_destination_func(piece_row_pos, dist_per_move),
+    )
+    if (
+        0 <= move_opt_1[0] < 8
+        and move_opt_1 not in black_pieces.keys()
+        and move_opt_1 not in white_pieces.keys()
+    ):
+        possible_moves.append(move_opt_1)
+
+    if (
+        0 <= move_opt_2[0] < 8
+        and move_opt_2 not in black_pieces.keys()
+        and move_opt_2 not in white_pieces.keys()
+    ):
+        possible_moves.append(move_opt_2)
 
     return possible_moves
 
 
-print(get_forward_move(black_pieces[(0, 1)]))
+print(get_forward_move(black_pieces[(2, 1)]))
 
 
 def get_backward_move():
