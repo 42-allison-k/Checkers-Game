@@ -101,6 +101,11 @@ def is_availible_space(moves: List):
             and move not in white_pieces.keys()
         ):
             availible_moves.append(move)
+        elif 2 <= move[0] < 6 and (
+            move in black_pieces.keys() or move in white_pieces.keys()
+        ):
+            jump_move = (move[0] + 1, move[1] + 1)
+            availible_moves.append(jump_move)
 
     return availible_moves
 

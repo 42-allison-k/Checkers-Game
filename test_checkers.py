@@ -95,7 +95,7 @@ a piece with one in the way of a different color going forward
             Piece(type=PAWN, position=(1, 1), color=BLACK),
             {(2, 2): Piece(type=PAWN, position=(2, 2), color=WHITE)},
             {},
-            [(0, 2)],
+            [(3, 3), (0, 2)],
             id="Black Piece with a white piece in the way",
         ),
     ],
