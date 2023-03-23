@@ -12,7 +12,7 @@ KING = "K"
 Position = Tuple[int, int]
 
 white_start_positions = {(1, 6), (3, 6), (5, 6), (7, 6), (0, 7), (2, 7), (4, 7), (6, 7)}
-black_start_positions = {(1, 0), (3, 0), (5, 0), (7, 0), (0, 1), (2, 3), (4, 1), (6, 1)}
+black_start_positions = {(1, 0), (3, 0), (5, 0), (7, 0), (0, 1), (2, 1), (4, 1), (6, 1)}
 
 
 @dataclass
@@ -71,14 +71,41 @@ def get_user_input():
 # change name of variable
 # look breaking into more functions
 # function to determines forward moves and backward moves for pawns and kings
-# def get_move_options(cur_position: Position) -> List:
-# """
-# Returns a list of possible moves
-
-# Example: (2, 1) -> [(3, 2), (1, 2)]
-# """
 
 
+# def is_availible_space(piece: Piece):
+#     row_pos = piece.position[1]
+#     goal = GOAL_ROW[piece.color]
+#     dist_per_move = 1
+#     open_spaces = []
+#     open_row_forward_func = operator.__add__ if goal > row_pos else operator.__sub__
+#     open_row_back_func = operator.__add__ if goal < row_pos else operator.__sub__
+#     open_col_right_func = operator.__add__(piece.position[0], dist_per_move)
+#     open_col_left_func = operator.__sub__(piece.position[0], dist_per_move)
+#     open_space_forward_right = (
+#         open_col_right_func(piece.position[0], dist_per_move),
+#         open_row_forward_func(row_pos, dist_per_move),
+#     )
+#     open_space_forward_left = (
+#         open_col_left_func(piece.position[0], dist_per_move),
+#         open_row_forward_func(row_pos, dist_per_move),
+#     )
+
+# Could rework this to return true if move is possible and the append move in other function
+def is_availible_space(moves: List):
+    availible_moves = []
+    for move in moves:
+        if (
+            0 <= move[0] < 8
+            and move not in black_pieces.keys()
+            and move not in white_pieces.keys()
+        ):
+            availible_moves.append(move)
+
+    return availible_moves
+
+
+# Could write helper function to check for a jump if is_availible_space returns false to check if a jump is possible
 def get_forward_move(piece: Piece):
     """
     Returns a list of possible forward moves
@@ -97,7 +124,7 @@ def get_forward_move(piece: Piece):
     if destination is a posible move add it to the list
     return the list
     """
-
+    # breakpoint()
     possible_moves = []
     piece_row_pos = piece.position[1]
     dist_per_move = 1
@@ -105,31 +132,25 @@ def get_forward_move(piece: Piece):
     row_destination_func = (
         operator.__add__ if goal > piece_row_pos else operator.__sub__
     )
-    move_opt_1 = (
-        (piece.position[0] + 1),
+    # move_right_func = operator.__add__(piece.position[0], dist_per_move)
+    # move_left_func = operator.__sub__(piece.position[0], dist_per_move)
+    move_right = (
+        operator.__add__(piece.position[0], dist_per_move),
         row_destination_func(piece_row_pos, dist_per_move),
     )
-    move_opt_2 = (
-        (piece.position[0] - 1),
+    # Could put an if in here to allow for a jump by changing dist_per_move to 2
+    move_left = (
+        operator.__sub__(piece.position[0], dist_per_move),
         row_destination_func(piece_row_pos, dist_per_move),
     )
-    if (
-        0 <= move_opt_1[0] < 8
-        and move_opt_1 not in black_pieces.keys()
-        and move_opt_1 not in white_pieces.keys()
-    ):
-        possible_moves.append(move_opt_1)
-
-    if (
-        0 <= move_opt_2[0] < 8
-        and move_opt_2 not in black_pieces.keys()
-        and move_opt_2 not in white_pieces.keys()
-    ):
-        possible_moves.append(move_opt_2)
+    # make helper function is_availible_space for this
+    moves = [move_right, move_left]
+    possible_moves = is_availible_space(moves)
 
     return possible_moves
 
 
+# have one function get_move with an argument for forward or back
 def get_backward_move(piece: Piece):
     """
     Returns a list of possible backward moves

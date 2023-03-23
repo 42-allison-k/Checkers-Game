@@ -1,9 +1,15 @@
 import pytest
+import checkers_game
 from checkers_game import (
     get_user_input,
     translate_external_to_internal,
     translate_internal_to_external,
-    get_move_options,
+    get_forward_move,
+    Piece,
+    PAWN,
+    BLACK,
+    WHITE,
+    KING,
 )
 
 
@@ -49,13 +55,65 @@ def test_translate_internal_to_external_success(
     assert trans_output == expected_output
 
 
-# need to figure out how to do this so it works
-# include check for piece in destination
+"""
+a piece in col 0
+a piece in col 7
+a piece in the middle
+a piece with one in the way of the same color going forward
+a piece with one in the way of the same color going back
+a piece with one in the way of a different color going back
+a piece with one in the way of a different color going forward
+
+"""
+
+
 @pytest.mark.parametrize(
-    ["input_tup, output_list"],
-    [((0, 1), [(1, 2)]), ((2, 1), [(1, 2), (3, 2)]), ((6, 1), [(7, 2)])],
+    ["test_piece", "white_pieces", "black_pieces", "expected_moves"],
+    [
+        pytest.param(
+            Piece(type=PAWN, position=(0, 6), color=WHITE),
+            {},
+            {},
+            [(1, 5)],
+            id="single white piece on the left edge of the board",
+        ),
+        pytest.param(
+            Piece(type=PAWN, position=(0, 1), color=BLACK),
+            {},
+            {},
+            [(1, 2)],
+            id="single black piece on the left edge of the board",
+        ),
+        pytest.param(
+            Piece(type=PAWN, position=(0, 6), color=WHITE),
+            {(1, 5): Piece(type=PAWN, position=(1, 5), color=WHITE)},
+            {},
+            [],
+            id="White Piece with a white piece in the way",
+        ),
+        pytest.param(
+            Piece(type=PAWN, position=(1, 1), color=BLACK),
+            {(2, 2): Piece(type=PAWN, position=(2, 2), color=WHITE)},
+            {},
+            [(0, 2)],
+            id="Black Piece with a white piece in the way",
+        ),
+    ],
 )
-def test_get_move_options(input_tup, output_list):
-    move_output = get_move_options(input_tup)
-    expected_moves = output_list
+def test_get_forward_move(
+    test_piece, white_pieces, black_pieces, expected_moves, monkeypatch
+):
+    # GIVEN
+    if test_piece.color == WHITE:
+        white_pieces[test_piece.position] = test_piece
+    else:
+        black_pieces[test_piece.position] = test_piece
+
+    monkeypatch.setattr(checkers_game, "white_pieces", white_pieces)
+    monkeypatch.setattr(checkers_game, "black_pieces", black_pieces)
+
+    # WHEN
+    move_output = get_forward_move(test_piece)
+
+    # THEN
     assert move_output == expected_moves
