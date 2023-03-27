@@ -57,9 +57,12 @@ def test_translate_internal_to_external_success(
 
 
 """
-a piece in col 0
-a piece in col 7
-a piece in the middle
+a piece in col 0 moving forward
+a piece in col 7 moving forward
+a piece in the middle moving forward
+a piece in col 0 moving back
+a piece in col 7 moving back
+a piece in the middle moving back
 a piece with one in the way of the same color going forward
 a piece with one in the way of the same color going back
 a piece with one in the way of a different color going back
@@ -69,27 +72,46 @@ a piece with one in the way of a different color going forward
 
 
 @pytest.mark.parametrize(
-    ["test_piece", "white_pieces", "black_pieces", "expected_moves"],
+    ["test_piece", "white_pieces", "black_pieces", "expected_moves", "direction"],
     [
         pytest.param(
             Piece(type=PAWN, position=(0, 6), color=WHITE),
             {},
             {},
             [(1, 5)],
-            id="single white piece on the left edge of the board",
+            "forward",
+            id="single white piece on the left edge of the board moving forward",
+        ),
+        pytest.param(
+            Piece(type=PAWN, position=(0, 6), color=WHITE),
+            {},
+            {},
+            [(1, 7)],
+            "back",
+            id="single white piece on the left edge of the board moving back",
         ),
         pytest.param(
             Piece(type=PAWN, position=(0, 1), color=BLACK),
             {},
             {},
             [(1, 2)],
-            id="single black piece on the left edge of the board",
+            "forward",
+            id="single black piece on the left edge of the board moving forward",
+        ),
+        pytest.param(
+            Piece(type=PAWN, position=(0, 3), color=BLACK),
+            {},
+            {},
+            [(1, 2)],
+            "back",
+            id="single black piece on the left edge of the board moving back",
         ),
         pytest.param(
             Piece(type=PAWN, position=(0, 6), color=WHITE),
             {(1, 5): Piece(type=PAWN, position=(1, 5), color=WHITE)},
             {},
-            [(2, 4)],
+            [],
+            "forward",
             id="White Piece with a white piece in the way",
         ),
         pytest.param(
@@ -97,12 +119,13 @@ a piece with one in the way of a different color going forward
             {(2, 2): Piece(type=PAWN, position=(2, 2), color=WHITE)},
             {},
             [(3, 3), (0, 2)],
+            "forward",
             id="Black Piece with a white piece in the way",
         ),
     ],
 )
 def test_get_forward_move(
-    test_piece, white_pieces, black_pieces, expected_moves, monkeypatch
+    test_piece, white_pieces, black_pieces, expected_moves, direction, monkeypatch
 ):
     # GIVEN
     if test_piece.color == WHITE:
@@ -114,7 +137,7 @@ def test_get_forward_move(
     monkeypatch.setattr(checkers_game, "black_pieces", black_pieces)
 
     # WHEN
-    move_output = get_forward_move(test_piece)
+    move_output = get_forward_move(test_piece, direction)
 
     # THEN
     assert move_output == expected_moves

@@ -113,7 +113,7 @@ def filter_available_spaces(moves: List) -> List:
 
 
 # Could write helper function to check for a jump if is_availible_space returns false to check if a jump is possible
-def get_forward_move(piece: Piece):
+def get_forward_move(piece: Piece, direction: str) -> List:
     """
     Returns a list of possible forward moves
 
@@ -136,9 +136,15 @@ def get_forward_move(piece: Piece):
     piece_row_pos = piece.position[1]
     dist_per_move = 1
     goal = GOAL_ROW[piece.color]
-    row_destination_func = (
-        operator.__add__ if goal > piece_row_pos else operator.__sub__
-    )
+    if direction == "forward":
+        row_destination_func = (
+            operator.__add__ if goal > piece_row_pos else operator.__sub__
+        )
+    elif direction == "back":
+        row_destination_func = (
+            operator.__add__ if goal < piece_row_pos else operator.__sub__
+        )
+
     # move_right_func = operator.__add__(piece.position[0], dist_per_move)
     # move_left_func = operator.__sub__(piece.position[0], dist_per_move)
     move_right = (
@@ -151,36 +157,6 @@ def get_forward_move(piece: Piece):
         row_destination_func(piece_row_pos, dist_per_move),
     )
     # make helper function is_available_space for this
-    moves = [move_right, move_left]
-    possible_moves = filter_available_spaces(moves)
-
-    return possible_moves
-
-
-# have one function get_move with an argument for forward or back
-def get_backward_move(piece: Piece):
-    """
-    Returns a list of possible backward moves
-    Example: (2, 3) -> [(3, 3), (1, 2)]
-    """
-    possible_moves = []
-    piece_row_pos = piece.position[1]
-    dist_per_move = 1
-    goal = GOAL_ROW[piece.color]
-    row_destination_func = (
-        operator.__add__ if goal < piece_row_pos else operator.__sub__
-    )
-
-    move_right = (
-        operator.__add__(piece.position[0], dist_per_move),
-        row_destination_func(piece_row_pos, dist_per_move),
-    )
-
-    move_left = (
-        operator.__sub__(piece.position[0], dist_per_move),
-        row_destination_func(piece_row_pos, dist_per_move),
-    )
-
     moves = [move_right, move_left]
     possible_moves = filter_available_spaces(moves)
 
