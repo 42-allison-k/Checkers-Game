@@ -92,7 +92,8 @@ def get_user_input():
 #     )
 
 # Could rework this to return true if move is possible and the append move in other function
-def is_availible_space(moves: List):
+# CHeck for jumpin off the end of the board
+def filter_available_spaces(moves: List) -> List:
     availible_moves = []
     for move in moves:
         if (
@@ -101,11 +102,12 @@ def is_availible_space(moves: List):
             and move not in white_pieces.keys()
         ):
             availible_moves.append(move)
-        elif 2 <= move[0] < 6 and (
+        elif 1 <= move[0] <= 6 and (
             move in black_pieces.keys() or move in white_pieces.keys()
         ):
             jump_move = (move[0] + 1, move[1] + 1)
-            availible_moves.append(jump_move)
+            if jump_move not in black_pieces.keys() or move in white_pieces.keys():
+                availible_moves.append(jump_move)
 
     return availible_moves
 
@@ -148,9 +150,9 @@ def get_forward_move(piece: Piece):
         operator.__sub__(piece.position[0], dist_per_move),
         row_destination_func(piece_row_pos, dist_per_move),
     )
-    # make helper function is_availible_space for this
+    # make helper function is_available_space for this
     moves = [move_right, move_left]
-    possible_moves = is_availible_space(moves)
+    possible_moves = filter_available_spaces(moves)
 
     return possible_moves
 
@@ -168,26 +170,18 @@ def get_backward_move(piece: Piece):
     row_destination_func = (
         operator.__add__ if goal < piece_row_pos else operator.__sub__
     )
-    move_opt_1 = (
-        (piece.position[0] + 1),
-        row_destination_func(piece_row_pos, dist_per_move),
-    )
-    move_opt_2 = (
-        (piece.position[0] - 1),
-        row_destination_func(piece_row_pos, dist_per_move),
-    )
-    if (
-        0 <= move_opt_1[0] < 8
-        and move_opt_1 not in black_pieces.keys()
-        and move_opt_1 not in white_pieces.keys()
-    ):
-        possible_moves.append(move_opt_1)
 
-    if (
-        0 <= move_opt_2[0] < 8
-        and move_opt_2 not in black_pieces.keys()
-        and move_opt_2 not in white_pieces.keys()
-    ):
-        possible_moves.append(move_opt_2)
+    move_right = (
+        operator.__add__(piece.position[0], dist_per_move),
+        row_destination_func(piece_row_pos, dist_per_move),
+    )
+
+    move_left = (
+        operator.__sub__(piece.position[0], dist_per_move),
+        row_destination_func(piece_row_pos, dist_per_move),
+    )
+
+    moves = [move_right, move_left]
+    possible_moves = filter_available_spaces(moves)
 
     return possible_moves
