@@ -5,7 +5,6 @@ from checkers_game import (
     translate_external_to_internal,
     translate_internal_to_external,
     get_forward_move,
-    get_backward_move,
     Piece,
     PAWN,
     BLACK,
@@ -110,7 +109,7 @@ a piece with one in the way of a different color going forward
             Piece(type=PAWN, position=(0, 6), color=WHITE),
             {(1, 5): Piece(type=PAWN, position=(1, 5), color=WHITE)},
             {},
-            [],
+            [(2, 6)],
             "forward",
             id="White Piece with a white piece in the way",
         ),
@@ -151,7 +150,3 @@ a piece with one in the way of the same color going back
 a piece with one in the way of a different color going back
 
 """
-
-
-def test_get_backward_move():
-    pass
