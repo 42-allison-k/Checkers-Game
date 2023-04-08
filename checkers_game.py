@@ -3,6 +3,96 @@ from typing import Tuple, List
 from dataclasses import dataclass
 import operator
 
+white_pawn = "o"
+black_pawn = "x"
+white_king = "O"
+black_king = "X"
+white_square = " "
+black_square = "#"
+
+board = [
+    [
+        black_square,
+        white_square,
+        black_square,
+        white_square,
+        black_square,
+        white_square,
+        black_square,
+        white_square,
+    ],
+    [
+        white_square,
+        black_square,
+        white_square,
+        black_square,
+        white_square,
+        black_square,
+        white_square,
+        black_square,
+    ],
+    [
+        black_square,
+        white_square,
+        black_square,
+        white_square,
+        black_square,
+        white_square,
+        black_square,
+        white_square,
+    ],
+    [
+        white_square,
+        black_square,
+        white_square,
+        black_square,
+        white_square,
+        black_square,
+        white_square,
+        black_square,
+    ],
+    [
+        black_square,
+        white_square,
+        black_square,
+        white_square,
+        black_square,
+        white_square,
+        black_square,
+        white_square,
+    ],
+    [
+        white_square,
+        black_square,
+        white_square,
+        black_square,
+        white_square,
+        black_square,
+        white_square,
+        black_square,
+    ],
+    [
+        black_square,
+        white_square,
+        black_square,
+        white_square,
+        black_square,
+        white_square,
+        black_square,
+        white_square,
+    ],
+    [
+        white_square,
+        black_square,
+        white_square,
+        black_square,
+        white_square,
+        black_square,
+        white_square,
+        black_square,
+    ],
+]
+
 
 BLACK = "B"
 WHITE = "W"
@@ -28,6 +118,27 @@ white_pieces = {
 black_pieces = {
     pos: Piece(type=PAWN, position=pos, color=BLACK) for pos in black_start_positions
 }
+
+
+def display_board():
+    print("    ABCDEFGH ")
+    print("  +----------+")
+
+    for r, row in enumerate(board):
+        print(r + 1, "| ", end="")
+        for s, square in enumerate(row):
+            if (s, r) in black_pieces.keys():
+                print(black_pawn, end="")
+            elif (s, r) in white_pieces.keys():
+                print(white_pawn, end="")
+            else:
+                print(square, end="")
+        print(" |")
+
+    print("  +----------+")
+
+
+display_board()
 
 
 def translate_external_to_internal(user_input: str) -> Position:
@@ -68,32 +179,7 @@ def get_user_input():
     return player_input
 
 
-# change name of variable
-# look breaking into more functions
-# function to determines forward moves and backward moves for pawns and kings
-
-
-# def is_availible_space(piece: Piece):
-#     row_pos = piece.position[1]
-#     goal = GOAL_ROW[piece.color]
-#     dist_per_move = 1
-#     open_spaces = []
-#     open_row_forward_func = operator.__add__ if goal > row_pos else operator.__sub__
-#     open_row_back_func = operator.__add__ if goal < row_pos else operator.__sub__
-#     open_col_right_func = operator.__add__(piece.position[0], dist_per_move)
-#     open_col_left_func = operator.__sub__(piece.position[0], dist_per_move)
-#     open_space_forward_right = (
-#         open_col_right_func(piece.position[0], dist_per_move),
-#         open_row_forward_func(row_pos, dist_per_move),
-#     )
-#     open_space_forward_left = (
-#         open_col_left_func(piece.position[0], dist_per_move),
-#         open_row_forward_func(row_pos, dist_per_move),
-#     )
-
-# Could rework this to return true if move is possible and the append move in other function
-# CHeck for jumpin off the end of the board
-def filter_available_spaces(moves: List) -> List:
+def filter_available_spaces(moves: List, goal: int) -> List:
     availible_moves = []
     for move in moves:
         if (
@@ -105,8 +191,16 @@ def filter_available_spaces(moves: List) -> List:
         elif 1 <= move[0] <= 6 and (
             move in black_pieces.keys() or move in white_pieces.keys()
         ):
-            jump_move = (move[0] + 1, move[1] + 1)
-            if jump_move not in black_pieces.keys() or move in white_pieces.keys():
+            if goal == 7:
+                jump_move = (move[0] + 1, move[1] + 1)
+                if (
+                    jump_move not in black_pieces.keys()
+                    and move not in white_pieces.keys()
+                ):
+                    availible_moves.append(jump_move)
+            else:
+                jump_move = (move[0] - 1, move[1] - 1)
+            if jump_move not in black_pieces.keys() and move not in white_pieces.keys():
                 availible_moves.append(jump_move)
 
     return availible_moves
@@ -145,8 +239,6 @@ def get_forward_move(piece: Piece, direction: str) -> List:
             operator.__add__ if goal < piece_row_pos else operator.__sub__
         )
 
-    # move_right_func = operator.__add__(piece.position[0], dist_per_move)
-    # move_left_func = operator.__sub__(piece.position[0], dist_per_move)
     move_right = (
         operator.__add__(piece.position[0], dist_per_move),
         row_destination_func(piece_row_pos, dist_per_move),
@@ -158,6 +250,6 @@ def get_forward_move(piece: Piece, direction: str) -> List:
     )
     # make helper function is_available_space for this
     moves = [move_right, move_left]
-    possible_moves = filter_available_spaces(moves)
+    possible_moves = filter_available_spaces(moves, goal)
 
     return possible_moves
